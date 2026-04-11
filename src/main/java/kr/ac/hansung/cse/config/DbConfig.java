@@ -39,7 +39,9 @@ public class DbConfig {
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        ds.setUrl("jdbc:mysql://localhost:3306/productdb" +
+        // docker에서 tomcat으로 mysql접근시 localhost->mysql로 수정해야함
+        // 외부 접근은 localhost
+        ds.setUrl("jdbc:mysql://mysql:3306/productdb" +
                   "?useSSL=false" +
                   "&allowPublicKeyRetrieval=true" +
                   "&serverTimezone=Asia/Seoul" +
