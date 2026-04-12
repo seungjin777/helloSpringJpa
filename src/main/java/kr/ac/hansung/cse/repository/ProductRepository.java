@@ -109,6 +109,18 @@ public class ProductRepository {
                 .getResultList();
     }
 
+    // 이름 검색 + 카테고리 id 검색 둘 다 적용된 경우
+    public List<Product> findByNameCategoryId(String keyword, Long categoryId){
+        return entityManager.createQuery(
+                        "SELECT p FROM Product p " +
+                                "WHERE p.category.id = :cid " +
+                                "AND " +
+                                "p.name LIKE :keyword",
+                        Product.class)
+                .setParameter("cid", categoryId)
+                .setParameter("keyword", "%" + keyword + "%")
+                .getResultList();
+    }
 
     /**
      * 상품 저장 (신규 생성)

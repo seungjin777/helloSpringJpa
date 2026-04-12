@@ -59,7 +59,10 @@ public class ProductController {
             Model model) {
         List<Product> products;
 
-        if(keyword != null && !keyword.isBlank()){ //키워드 값이 있으면
+        if(keyword != null && !keyword.isBlank() && categoryId != null) {
+            // 키워드 검색 + 카테고리 id 필터 둘다 적용된 경우도 있을 것 같아 추가
+            products = productService.searchByNameCategory(keyword, categoryId);
+        } else if(keyword != null && !keyword.isBlank()){ //키워드 값이 있으면
             products = productService.searchByName(keyword);
         } else if (categoryId != null){ //카테고리 id 값이 있으면
             products = productService.searchByCategory(categoryId);

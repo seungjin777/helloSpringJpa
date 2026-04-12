@@ -98,6 +98,11 @@ public class ProductService {
         return productRepository.findByCategoryId(categoryId);
     }
 
+    // 상품명 + 카테고리 id 조회
+    public List<Product> searchByNameCategory(String keword, Long categoryId){
+        return productRepository.findByNameCategoryId(keword, categoryId);
+    }
+
 
     /**
      * 새 상품 등록
