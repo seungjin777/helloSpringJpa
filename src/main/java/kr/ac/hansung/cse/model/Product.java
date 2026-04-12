@@ -29,7 +29,7 @@ import java.util.List;
  * [Lombok 어노테이션 설명]
  * @Getter  : 모든 필드의 getter 메서드를 자동 생성합니다.
  * @Setter  : 모든 필드의 setter 메서드를 자동 생성합니다.
- * @ToString: toString() 메서드를 자동 생성합니다.
+ * @ToString: toString() 메서드를 자동 생성합니다. -- 객체의 문자열을 쉽게 출력 가능
  *            exclude로 특정 필드를 제외할 수 있습니다.
  * @NoArgsConstructor: 매개변수 없는 기본 생성자를 자동 생성합니다.
  *            access = AccessLevel.PROTECTED: JPA 요구사항에 맞게
