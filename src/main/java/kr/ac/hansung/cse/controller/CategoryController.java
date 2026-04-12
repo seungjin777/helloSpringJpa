@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -60,5 +57,21 @@ public class CategoryController {
         }
 
         return "redirect:/categories"; // 정상 등록시 리다이렉트
+    }
+
+
+    //POST /categories/{id}/delete - 카테고리 삭제 처리
+    @PostMapping("/{id}/delete")
+    public String deleteCategory(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes){
+        try{
+            categoryService.deleteCategory(id); // 삭제 로직 호출
+            redirectAttributes.addFlashAttribute("successMessage", "삭제 완료");
+        }catch(IllegalStateException e){
+            // 연결된 상품이 있는 경우 예외 처리
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/categories";
     }
 }

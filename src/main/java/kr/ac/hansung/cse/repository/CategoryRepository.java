@@ -12,11 +12,18 @@ import java.util.Optional;
 public class CategoryRepository {
 
     @PersistenceContext
-    private EntityManager em;
+    private EntityManager em; // 엔티티 매니저
 
+    // 저장
     public Category save(Category category) {
         em.persist(category);
         return category;
+    }
+
+    // 삭제
+    public void delete(Long id){
+        Category c = em.find(Category.class, id);
+        if (c != null) em.remove(c);
     }
 
     public Optional<Category> findById(Long id) {
@@ -37,6 +44,16 @@ public class CategoryRepository {
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
+
+    // 삭제 전 연결 상품 수 확인 count 쿼리
+    public long countProductsByCategoryId(Long categoryId) {
+        return em.createQuery(
+                        "SELECT COUNT(p) FROM Product p WHERE p.category.id = :id",
+                        Long.class
+                ).setParameter("id", categoryId).getSingleResult();
+    }
+
+
     // JOIN FETCH: N+1 문제 방지 (Category + Products 한 번에 로드)
     public Optional<Category> findByIdWithProducts(Long id) {
         List<Category> result = em.createQuery(
@@ -46,5 +63,7 @@ public class CategoryRepository {
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
+
+
 }
 

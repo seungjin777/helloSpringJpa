@@ -32,9 +32,14 @@ public class CategoryService {
         return categoryRepository.save(new Category(name)); //유효성 검증 통과시 저장
     }
 
-//    @Transactional
-//    public void deleteCategory(Long id){
-//
-//    }
+    // 삭제, 상품 연결 확인 후 삭제
+    @Transactional
+    public void deleteCategory(Long id){
+        // 삭제하려는 카테고리가 몇개의 상품과 연관 되어있는지
+        long count = categoryRepository.countProductsByCategoryId(id);
 
+        if(count > 0) throw new IllegalStateException(
+                "상품 " + count + "개가 연결되어 있어 삭제할 수 없습니다.");
+        categoryRepository.delete(id);         // 관련 상품 없으면 삭제
+    }
 }

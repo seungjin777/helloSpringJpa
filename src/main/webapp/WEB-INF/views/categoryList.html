@@ -34,18 +34,24 @@
     </style>
 </head>
 <body>
+<th:block th:if="${errorMessage}">
+    <script th:inline="javascript">
+        alert([[${errorMessage}]]);
+    </script>
+</th:block>
+
+<th:block th:if="${successMessage}">
+    <script th:inline="javascript">
+        alert([[${successMessage}]]);
+    </script>
+</th:block>
+
 
 <h1>카테고리 목록</h1>
-<div class="alert-success" th:if="${successMessage}">
-    <span th:text="${successMessage}">성공 메시지</span>
-</div>
-
 <a class="btn" th:href="@{/categories/create}">+ 새 카테고리 등록</a>
-
 <div class="empty-msg" th:if="${#lists.isEmpty(categories)}">
     등록된 카테고리가 없습니다. 새 카테고리를 등록해 주세요.
 </div>
-
 <table th:unless="${#lists.isEmpty(categories)}">
     <thead>
     <tr>
