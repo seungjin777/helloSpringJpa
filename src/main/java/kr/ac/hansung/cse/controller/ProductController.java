@@ -113,6 +113,7 @@ public class ProductController {
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         model.addAttribute("productForm", new ProductForm());
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "productForm";
     }
 
@@ -183,6 +184,7 @@ public class ProductController {
 
         // 엔티티 → DTO 변환 (기존 데이터로 폼 초기화)
         model.addAttribute("productForm", ProductForm.from(product));
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "productEditForm";
     }
 
