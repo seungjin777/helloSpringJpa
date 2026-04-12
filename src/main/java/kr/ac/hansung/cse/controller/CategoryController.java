@@ -1,12 +1,19 @@
 package kr.ac.hansung.cse.controller;
 
+import jakarta.validation.Valid;
+import kr.ac.hansung.cse.exception.DuplicateCategoryException;
 import kr.ac.hansung.cse.model.Category;
+import kr.ac.hansung.cse.model.CategoryForm;
 import kr.ac.hansung.cse.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -20,8 +27,38 @@ public class CategoryController {
     //GET /categories - 카테고리 목록 조회
     @GetMapping
     public String listCategories(Model model){
-        List<Category> categories = categoryService.getAllCategorys();
+        List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories); //타임리프가 model 꺼내서 랜더링 할 수 있게
         return "categoryList";
+    }
+
+
+    //GET /categories/create - get 카테고리 등록 폼 표시
+    @GetMapping("/create")
+    public String showCreateForm(Model model){
+        model.addAttribute("categoryForm", new CategoryForm());
+        return "categoryForm";
+    }
+
+
+    //POST /categories/create - post 카테고리 등록 처리
+    @PostMapping("/create")
+    public String createCategory(
+            @Valid @ModelAttribute CategoryForm categoryForm, // form 객체에 바인딩
+            BindingResult bindingResult,                    // 검증 결과를 담아 예외 프론트에서 처리할 수 있게
+            RedirectAttributes redirectAttributes ){
+
+        if (bindingResult.hasErrors()) return "categoryForm"; // 오류나면 다시 폼페이지로 가라
+
+        try{
+            categoryService.createCategory(categoryForm.getName()); // 폼에 입력된 이름으로 카테고리 중복검사 후 생성
+            redirectAttributes.addAttribute("suceessMessage", "등록 완료");
+        } catch (DuplicateCategoryException e){
+            // 중복 예외 처리    -- rejectValue(필드명, 오류코드, 오류메시지)
+            bindingResult.rejectValue("name", "duplicate", e.getMessage());
+            return "categoryForm";
+        }
+
+        return "redirect:/categories"; // 정상 등록시 리다이렉트
     }
 }
