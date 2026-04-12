@@ -67,7 +67,8 @@ public class ProductController {
             products = productService.getAllProducts();
         }
 
-        // 드롭다운 현재 하드 코딩 되어있어 그거 실제로 불러오려면 카테고리 목록 조회 필요
+        model.addAttribute("products", products);
+        // 드롭다운 실제로 불러오려면 카테고리 목록 조회 필요, 상품 생성에 보여지는 카테고리 목록도 수정해야함(하드코딩 돼있음)
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("keyword", keyword);
         model.addAttribute("categoryId", categoryId);
