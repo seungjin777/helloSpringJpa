@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import kr.ac.hansung.cse.exception.ProductNotFoundException;
 import kr.ac.hansung.cse.model.Product;
 import kr.ac.hansung.cse.model.ProductForm;
+import kr.ac.hansung.cse.service.CategoryService;
 import kr.ac.hansung.cse.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,20 +38,43 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(
+            ProductService productService,
+            CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
 
     // ─────────────────────────────────────────────────────────────────
     // GET /products - 상품 목록 조회
     // ─────────────────────────────────────────────────────────────────
-
+    // /products?[keyword=노트북 | categoryId=1]
     @GetMapping
-    public String listProducts(Model model) {
-        List<Product> products = productService.getAllProducts();
+    public String listProducts(
+            @RequestParam(required = false) String keyword, // 키워드로 검색
+            @RequestParam(required = false) Long categoryId, // 카테고리id로 검색
+            Model model) {
+        List<Product> products;
+
+        if(keyword != null && !keyword.isBlank() && categoryId != null) {
+            // 키워드 검색 + 카테고리 id 필터 둘다 적용된 경우도 있을 것 같아 추가
+            products = productService.searchByNameCategory(keyword, categoryId);
+        } else if(keyword != null && !keyword.isBlank()){ //키워드 값이 있으면
+            products = productService.searchByName(keyword);
+        } else if (categoryId != null){ //카테고리 id 값이 있으면
+            products = productService.searchByCategory(categoryId);
+        } else {
+            products = productService.getAllProducts();
+        }
+
         model.addAttribute("products", products);
+        // 드롭다운 실제로 불러오려면 카테고리 목록 조회 필요, 상품 생성에 보여지는 카테고리 목록도 수정해야함(하드코딩 돼있음)
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("categoryId", categoryId);
         return "productList";
     }
 
@@ -92,6 +116,7 @@ public class ProductController {
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         model.addAttribute("productForm", new ProductForm());
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "productForm";
     }
 
@@ -162,6 +187,7 @@ public class ProductController {
 
         // 엔티티 → DTO 변환 (기존 데이터로 폼 초기화)
         model.addAttribute("productForm", ProductForm.from(product));
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "productEditForm";
     }
 

@@ -90,6 +90,38 @@ public class ProductRepository {
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
+
+    // 이름으로 검색, Like 검색
+    public List<Product> findByNameContaining(String keyword){
+        return entityManager.createQuery(
+                "SELECT p FROM Product p LEFT JOIN FETCH p.category WHERE p.name LIKE :keyword",
+                Product.class)
+                .setParameter("keyword", "%" + keyword + "%") // 키워드가 포함되어 있는
+                .getResultList();
+    }
+
+    // 카테고리 필터, 카테고리 id로 조회
+    public List<Product> findByCategoryId(Long categoryId){
+        return entityManager.createQuery(
+                "SELECT p FROM Product p LEFT JOIN FETCH p.category WHERE p.category.id = :cid",
+                Product.class)
+                .setParameter("cid", categoryId)
+                .getResultList();
+    }
+
+    // 이름 검색 + 카테고리 id 검색 둘 다 적용된 경우
+    public List<Product> findByNameCategoryId(String keyword, Long categoryId){
+        return entityManager.createQuery(
+                        "SELECT p FROM Product p LEFT JOIN FETCH p.category " +
+                                "WHERE p.category.id = :cid " +
+                                "AND " +
+                                "p.name LIKE :keyword",
+                        Product.class)
+                .setParameter("cid", categoryId)
+                .setParameter("keyword", "%" + keyword + "%")
+                .getResultList();
+    }
+
     /**
      * 상품 저장 (신규 생성)
      *
